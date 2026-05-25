@@ -361,15 +361,21 @@ class AquilaBluetoothTUI(App):
         devices = {}
         for line in dev_raw.splitlines():
             parts = line.split(" ", 2)
-            if len(parts) < 3:
+            if len(parts) < 2:
                 continue
-            mac, name = parts[1], parts[2]
+            mac = parts[1].strip()
             if mac in devices:
                 continue
+            name = parts[2].strip() if len(parts) > 2 and parts[2].strip() else mac
             info = subprocess.run(
                 f"bluetoothctl info {mac}", shell=True, capture_output=True, text=True
             ).stdout
             connected = "Connected: yes" in info
+            real_name = name
+            for il in info.splitlines():
+                if "Name: " in il:
+                    real_name = il.split("Name: ", 1)[1].strip()
+                    break
             icon_key = "default"
             for il in info.splitlines():
                 if "Icon: " in il:
@@ -377,7 +383,7 @@ class AquilaBluetoothTUI(App):
                     break
             devices[mac] = {
                 "mac": mac,
-                "name": name,
+                "name": real_name,
                 "connected": connected,
                 "icon": ICON_MAP.get(icon_key, ICON_DEFAULT),
             }
@@ -406,14 +412,29 @@ class AquilaBluetoothTUI(App):
                 None, lambda: subprocess.run(f"{cmd} >/dev/null 2>&1", shell=True)
             )
         elif bid == "btn-scan":
-            scan = (
-                "bluetoothctl scan on >/dev/null 2>&1 & "
-                "sleep 5; "
-                "bluetoothctl scan off >/dev/null 2>&1"
-            )
+            status = self.query_one("#status-card", Label)
+            status.update("Ligando BT…")
             await loop.run_in_executor(
-                None, lambda: subprocess.run(scan, shell=True)
+                None, lambda: subprocess.run(
+                    "bluetoothctl power off >/dev/null 2>&1", shell=True
+                )
             )
+            await asyncio.sleep(1)
+            await loop.run_in_executor(
+                None, lambda: subprocess.run(
+                    "bluetoothctl power on >/dev/null 2>&1", shell=True
+                )
+            )
+            status.update("Escaneando… (12s)")
+            await loop.run_in_executor(
+                None, lambda: subprocess.run(
+                    "timeout 12 bluetoothctl scan on",
+                    shell=True,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                )
+            )
+            status.update("Scan concluído")
         elif bid.startswith("conn-"):
             mac = bid[5:].replace("-", ":")
             await loop.run_in_executor(
@@ -431,5 +452,18 @@ class AquilaBluetoothTUI(App):
         self._refresh_loop()
 
 
+class BluetoothWindow:
+    """Wrapper que expõe AquilaBluetoothTUI como sub‑app do desktop.
+    Retorna a instância do App para ser exibida dentro do desktop.
+    """
+    title = "Bluetooth Manager"
+    window_id = "bluetooth"
+
+    @staticmethod
+    def create() -> "AquilaBluetoothTUI":
+        return AquilaBluetoothTUI()
+
+
 if __name__ == "__main__":
     AquilaBluetoothTUI().run()
+
