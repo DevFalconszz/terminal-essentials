@@ -27,184 +27,46 @@ COLOR_GREEN   = "#4ade80"
 COLOR_RED     = "#f87171"
 COLOR_CONN_BG = "#0f2030"
 
-ICON_DEFAULT = "📶"
+def _signal_bars(pct: str) -> str:
+    try:
+        v = int(pct)
+    except:
+        return "○"
+    if v <= 0: return "○"
+    if v <= 25: return "▂"
+    if v <= 50: return "▂▄"
+    if v <= 75: return "▂▄▆"
+    return "▂▄▆█"
+
+def _sec_icon(sec: str) -> str:
+    return "🔒" if sec and sec not in ("", "--") else "🔓"
 
 CSS = f"""
-Screen {{
-    background: {BG_MAIN};
-    align: center middle;
-}}
-
-#frame {{
-    width: 80;
-    height: 24;
-    border: round {COLOR_BLUE};
-    background: {BG_CARD};
-    layout: horizontal;
-}}
-
-#sidebar {{
-    width: 24;
-    height: 100%;
-    padding: 1 1;
-    layout: vertical;
-    border-right: round {BG_GLASS};
-}}
-
-#logo {{
-    height: 1;
-    content-align: center middle;
-    color: {COLOR_BLUE};
-    text-style: bold;
-    margin-bottom: 1;
-}}
-
-#status-card {{
-    height: 3;
-    border: round {COLOR_LAVA};
-    background: {BG_GLASS};
-    content-align: center middle;
-    color: {COLOR_BLUE2};
-    margin-bottom: 2;
-    padding: 0 1;
-}}
-
-#status-card.online {{
-    border: round {COLOR_GREEN};
-    color: {COLOR_GREEN};
-}}
-
-.ctrl-btn {{
-    width: 100%;
-    height: 3;
-    margin-bottom: 1;
-    background: {BG_GLASS};
-    color: {COLOR_BLUE2};
-    border: none;
-    text-style: bold;
-    transition: background 120ms, color 120ms;
-}}
-
-.ctrl-btn:hover {{
-    background: {COLOR_BLUE};
-    color: {BG_MAIN};
-}}
-
-#spacer {{
-    height: 1fr;
-}}
-
-#exit-btn {{
-    width: 100%;
-    height: 3;
-    background: {BG_GLASS};
-    color: {COLOR_ROSE};
-    border: none;
-    text-style: bold;
-    transition: background 120ms, color 120ms;
-}}
-
-#exit-btn:hover {{
-    background: {COLOR_RED};
-    color: {BG_MAIN};
-}}
-
-#right-panel {{
-    width: 1fr;
-    height: 100%;
-    padding: 1 1;
-    layout: vertical;
-}}
-
-#panel-title {{
-    height: 1;
-    color: {COLOR_MUTED};
-    text-style: bold;
-    margin-bottom: 1;
-    content-align: left middle;
-}}
-
-#network-list {{
-    height: 1fr;
-    background: transparent;
-    border: none;
-}}
-
-NetworkItem {{
-    height: 3;
-    background: {BG_GLASS};
-    border: round {BG_GLASS};
-    margin-bottom: 1;
-    padding: 0 1;
-    layout: horizontal;
-    align: left middle;
-    transition: background 120ms, border 120ms;
-}}
-
-NetworkItem:hover {{
-    background: {BG_HOVER};
-    border: round {COLOR_BLUE};
-}}
-
-NetworkItem.connected {{
-    background: {COLOR_CONN_BG};
-    border: round {COLOR_GREEN};
-}}
-
-.dev-icon {{
-    width: 4;
-    content-align: center middle;
-    color: {COLOR_BLUE};
-}}
-
-.dev-info {{
-    width: 1fr;
-    layout: vertical;
-    align-vertical: middle;
-}}
-
-.dev-name {{
-    text-style: bold;
-    color: {COLOR_TEXT};
-}}
-
-.dev-sub {{
-    color: {COLOR_MUTED};
-}}
-
-.dev-sub.connected {{
-    color: {COLOR_GREEN};
-}}
-
-.btn-connect {{
-    height: 1;
-    min-width: 12;
-    padding: 0 2;
-    border: none;
-    background: {COLOR_BLUE};
-    color: {BG_MAIN};
-    text-style: bold;
-    transition: background 120ms;
-}}
-
-.btn-connect:hover {{
-    background: {COLOR_BLUE2};
-}}
-
-.btn-disconnect {{
-    height: 1;
-    min-width: 12;
-    padding: 0 2;
-    border: none;
-    background: {COLOR_ROSE};
-    color: {BG_MAIN};
-    text-style: bold;
-    transition: background 120ms;
-}}
-
-.btn-disconnect:hover {{
-    background: {COLOR_RED};
-}}
+Screen {{ background: {BG_MAIN}; align: center middle; }}
+#frame {{ width: 68; height: 20; border: round {COLOR_BLUE}; background: {BG_CARD}; layout: horizontal; }}
+#sidebar {{ width: 20; height: 100%; padding: 0 1; layout: vertical; border-right: round {BG_GLASS}; }}
+#logo {{ height: 1; content-align: center middle; color: {COLOR_BLUE}; text-style: bold; margin-bottom: 0; }}
+#status-card {{ height: 2; border: round {COLOR_LAVA}; background: {BG_GLASS}; content-align: center middle; color: {COLOR_BLUE2}; margin-bottom: 0; padding: 0 1; }}
+#status-card.online {{ border: round {COLOR_GREEN}; color: {COLOR_GREEN}; }}
+.ctrl-btn {{ width: 100%; height: 2; margin-bottom: 0; background: {BG_GLASS}; color: {COLOR_BLUE}; border: none; text-style: bold; content-align: center middle; transition: background 120ms, color 120ms; }}
+.ctrl-btn:hover {{ background: {COLOR_BLUE}; color: {BG_MAIN}; }}
+#spacer {{ height: 1fr; }}
+#exit-btn {{ width: 100%; height: 2; background: {BG_GLASS}; color: {COLOR_RED}; border: none; text-style: bold; content-align: center middle; transition: background 120ms, color 120ms; }}
+#exit-btn:hover {{ background: {COLOR_RED}; color: {BG_MAIN}; }}
+#right-panel {{ width: 1fr; height: 100%; padding: 0 1; layout: vertical; }}
+#panel-title {{ height: 1; color: {COLOR_MUTED}; text-style: bold; margin-bottom: 0; }}
+#network-list {{ height: 1fr; background: transparent; border: none; }}
+NetworkItem {{ height: 2; background: {BG_GLASS}; border: round {BG_GLASS}; margin-bottom: 0; padding: 0 1; layout: horizontal; align: left middle; transition: background 120ms, border 120ms; }}
+NetworkItem:hover {{ background: {BG_HOVER}; border: round {COLOR_BLUE}; }}
+NetworkItem.connected {{ background: {COLOR_CONN_BG}; border: round {COLOR_GREEN}; }}
+.dev-icon {{ width: 6; content-align: center middle; color: {COLOR_BLUE}; }}
+.dev-info {{ width: 1fr; layout: vertical; align-vertical: middle; }}
+.dev-name {{ text-style: bold; color: {COLOR_TEXT}; }}
+.dev-sub {{ color: {COLOR_MUTED}; }}
+.dev-sub.connected {{ color: {COLOR_GREEN}; }}
+.btn-connect {{ height: 1; min-width: 8; padding: 0 1; border: none; background: {COLOR_BLUE}; color: {BG_MAIN}; text-style: bold; content-align: center middle; transition: background 120ms; }}
+.btn-connect:hover {{ background: {COLOR_BLUE2}; }}
+.btn-disconnect {{ height: 1; min-width: 10; padding: 0 1; border: none; background: {COLOR_RED}; color: {BG_MAIN}; text-style: bold; content-align: center middle; }}
 """
 
 class NetworkItem(Static):
@@ -221,12 +83,16 @@ class NetworkItem(Static):
     def compose(self) -> ComposeResult:
         import re
         safe = re.sub(r'[^A-Za-z0-9_-]', '_', self.ssid)
+        bars = _signal_bars(self.signal)
+        sec = _sec_icon(self.security)
+        sub_text = f"{sec} {self.signal}%  {self.security}" if self.security not in ("", "--") else "🔓 Aberta"
         sub_class = "dev-sub connected" if self.connected else "dev-sub"
-        with Horizontal():
-            yield Label(ICON_DEFAULT, classes="dev-icon")
+        item_class = "connected" if self.connected else ""
+        with Horizontal(classes=item_class):
+            yield Label(bars, classes="dev-icon")
             with Vertical(classes="dev-info"):
                 yield Label(self.ssid, classes="dev-name")
-                yield Label(f"{self.signal}% {self.security}", classes=sub_class, id=f"sub-{safe}")
+                yield Label(sub_text, classes=sub_class)
             if self.connected:
                 yield Button("Desconectar", id=f"disc-{safe}", classes="btn-disconnect")
             else:
@@ -300,10 +166,13 @@ class AquilaWifiTUI(App):
         powered, cur_ssid = self._get_status()
         status_lbl = self.query_one("#status-card", Label)
         if powered:
-            status_lbl.update("󰂯  WiFi ATIVADO ●")
+            text = "󰂯  WiFi ATIVADO"
+            if cur_ssid:
+                text += f"  •  {cur_ssid}"
+            status_lbl.update(text)
             status_lbl.add_class("online")
         else:
-            status_lbl.update("󰂲  WiFi DESATIVADO ○")
+            status_lbl.update("󰂲  WiFi DESATIVADO")
             status_lbl.remove_class("online")
         list_view = self.query_one("#network-list", ListView)
         networks = self._scan_networks()
